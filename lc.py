@@ -1,14 +1,20 @@
 from flask import Flask, request, redirect
+
 from twilio.twiml.messaging_response import MessagingResponse
+
 from langchain.llms import OpenAI
 from langchain import PromptTemplate
+
 import os
 
 openai = OpenAI(
     model_name="text-davinci-003",
     openai_api_key=os.environ.get('OPENAI_API_KEY')
 )
+
+
 app = Flask(__name__)
+
 @app.route("/sms", methods=['GET', 'POST'])
 def sms_reply():
     # Start our TwiML response
