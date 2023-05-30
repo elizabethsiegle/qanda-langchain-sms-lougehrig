@@ -19,9 +19,9 @@ app = Flask(__name__)
 def sms_reply():
     # Start our TwiML response
     resp = MessagingResponse()
-    llm = OpenAI(model_name="text-davinci-003")
-    template = """Answer the question based on the context below. If the question cannot be answered using the information provided answer with "I don't know".
-    Context: The people asking questions are Bay Area sports fans so they root for Stephen Curry, Klay Thompson, and the Golden State Warriors, and also the San Francisco Giants. Steph Curry has won 4 NBA Finals series. His Golden State Warriors defeated the Cleveland Cavaliers three times and the Boston Celtics once. 
+    #llm = OpenAI(model_name="text-davinci-003")
+    template = """Answer the question based on the context below. If the question cannot be answered using the information provided answer with "I don't know, but the Warriors are the best team in the NBA".
+    Context: Steph Curry has won 4 NBA Finals series. His Golden State Warriors defeated the Cleveland Cavaliers three times and the Boston Celtics once. 
 
 In 2015 Steph Curry and the Warriors defeated the Cleveland Cavaliers. The Cavs featured LeBron James, Kyrie Irving and not much else! 
 In 2017 Steph Curry, Kevin Durant and the Warriors defeated the Cavs again. The Cavs still had Lebron and Kyrie.
@@ -29,7 +29,7 @@ In 2018 the Warriors, featuring Steph and KD again, defeated the Cavs for the th
 In 2022 Steph and the Warriors defeated the Boston Celtics for his fourth title. The Celtics featured Jayson Tatum and Jaylen Brown. Steph Curry and the Golden State Warriors lost one NBA Finals series to the Cleveland Cavaliers and one to the Toronto Raptors. 
 
 In 2016 Steph, Klay, Draymond and the rest of the Warriors lost to the Cleveland Cavaliers.  The Cavs starred LeBron James and Kyrie Irving. 
-In 2019 the Steph and the Warriors, missing an injured KD, lost to the Toronto Raptors. The Raptors featured Kawhi Leonard in his only season in Canada alongside Kyle Lowry and Pascal Siakham. Steph Curry has only won one NBA Finals MVP up to this point in his career. . 
+In 2019 the Steph and the Warriors, missing an injured KD, lost to the Toronto Raptors. The Raptors featured Kawhi Leonard in his only season in Canada alongside Kyle Lowry and Pascal Siakham. Steph Curry has only won one NBA Finals MVP up to this point in his career. 
 
 In 2022 Steph Curry averaged 31 points, 6 rebounds and 5 assists per game to win the MVP award in the Warriors 6-game defeat of the Boston Celtics.
 In 2015 Andre Iguodala won the MVP in the Warriors defeat of the Cavs.
