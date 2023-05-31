@@ -39,11 +39,11 @@ In both 2017 & 2018 Kevin Durant was Finals MVP in the Warriors victories over t
     prompt_template = PromptTemplate(
         input_variables=["query"],
         template=template
-    )
+    ) #future basketball with context template. q's go in here, could reuse code across templates like a func. prompt templates can use result from 1 prompt in another prompt: can pass/chain through
     question = request.form['Body'].lower().strip()
     #print(llm(question))
     print(openai(
-        prompt_template.format(
+        prompt_template.format( #basketball template: pass in query. could use on website/somewhere else/mobile app. 1 place/template can generate prompt (diff from prompt query): only thing changes
             query=question
         )
     ))
