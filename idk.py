@@ -1,51 +1,46 @@
-from langchain.embeddings.openai import OpenAIEmbeddings
-from langchain.embeddings.cohere import CohereEmbeddings
-from langchain.text_splitter import CharacterTextSplitter
-from langchain.vectorstores.elastic_vector_search import ElasticVectorSearch
-from langchain.vectorstores import Chroma
-from langchain.chains import RetrievalQAWithSourcesChain
-from langchain import OpenAI
-
-# load document
-# pdf_path = "/Users/lsiegle/Downloads/langchaincookbookfundamentals.pdf"
-# Using text-davinci-003 and a temperature of 0
-# llm = OpenAI(model_name='text-davinci-003', temperature=0, openai_api_key=OPENAI_API_KEY)
-
 import requests
+from langchain.document_loaders import TextLoader
 
-text_url = 'https://raw.githubusercontent.com/hwchase17/chat-your-data/master/state_of_the_union.txt'
-response = requests.get(text_url)
+def loadTXTFileFromURL(text_file_url='https://raw.githubusercontent.com/elizabethsiegle/qanda-langchain-sms-lougehrig/main/lougehrig.txt'):
+    # Fetching the text file
+    output_file_name = "url_text_file.txt"
+    response = requests.get(text_file_url)
+    with open(output_file_name, "w",  encoding='utf-8') as file:
+      file.write(response.text)
 
-#let'extract only the text from the response
-data = response.text
-# print(data)
+    # Load the text document using TextLoader
+    loader = TextLoader('./'+output_file_name)
+    loaded_docs = loader.load()
+    return loaded_docs
 
-text_splitter = CharacterTextSplitter(chunk_size=1000, chunk_overlap=0)
-texts = text_splitter.split_text(data)
+from langchain.text_splitter import CharacterTextSplitter
+def splitDocument(loaded_docs):
+    # Splitting documents into chunks
+    splitter = CharacterTextSplitter(chunk_size=1000, chunk_overlap=10)
+    chunked_docs = splitter.split_documents(loaded_docs)
+    return chunked_docs
+from langchain.embeddings import HuggingFaceEmbeddings
+from langchain.vectorstores import FAISS
+def createEmbeddings(chunked_docs):
+    # Create embeddings and store them in a FAISS vector store
+    embedder = HuggingFaceEmbeddings()
+    vector_store = FAISS.from_documents(chunked_docs, embedder)
+    return vector_store
+from langchain.chains.question_answering import load_qa_chain
+from langchain import HuggingFaceHub
+def loadLLMModel():
+    llm=HuggingFaceHub(repo_id="declare-lab/flan-alpaca-large", model_kwargs={"temperature":0, "max_length":512})
+    chain = load_qa_chain(llm, chain_type="stuff")
+    return chain
 
-embeddings = OpenAIEmbeddings()
-persist_directory = 'db'
-docsearch = Chroma.from_texts(
-    texts, 
-    embeddings,
-    persist_directory = persist_directory,
-    metadatas=[{"source": f"{i}-pl"} for i in range(len(texts))]
-    )
-# Convert the vectorstore to a retriever
-retriever = docsearch.as_retriever()
-docs = retriever.get_relevant_documents("https://raw.githubusercontent.com/elizabethsiegle/qanda-langchain-sms-lougehrig/main/lougehrig.txt")
-
-#create the chain to answer questions
-chain = RetrievalQAWithSourcesChain.from_chain_type(
-    llm=OpenAI(temperature=0), 
-    chain_type="stuff", 
-    retriever=retriever,
-    return_source_documents=True
-)
-def process_result(result):
-    print(result['answer'])
-    print("\n\n Sources : ", result['sources'])
-    print(result['sources'])
-question = "how much does lou gehrig have to live for"
-result = chain({"question": question})
-process_result(result)
+def askQuestions(vector_store, chain, question):
+    # Ask a question using the QA chain
+    similar_docs = vector_store.similarity_search(question)
+    response = chain.run(input_documents=similar_docs, question=question)
+    return response
+chain = loadLLMModel()
+LOCAL_loaded_docs = loadTXTFileFromURL()
+LOCAL_chunked_docs = splitDocument(LOCAL_loaded_docs)
+LOCAL_vector_store = createEmbeddings(LOCAL_chunked_docs)
+LOCAL_response = askQuestions(LOCAL_vector_store, chain, "What does Lou Gehrig have to live for?")
+print(LOCAL_response)
