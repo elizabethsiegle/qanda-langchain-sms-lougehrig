@@ -1,5 +1,6 @@
 ## Chat with a Document over SMS
 This generative question-answering SMS chatbot reads a document containing Lou Gehrig's Farewell Speech using LangChain, Hugging Face, and Twilio in Python.
+![sms example](https://github.com/elizabethsiegle/qanda-langchain-sms-lougehrig/assets/8932430/8972af5a-2576-4509-953d-0fd7c328fa4e)
 
 ### Prerequisites
 - A Twilio account - [sign up for a free one here](https://www.twilio.com/try-twilio)
